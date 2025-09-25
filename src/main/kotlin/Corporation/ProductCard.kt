@@ -1,0 +1,4 @@
+package Corporation
+
+class ProductCard {
+}
