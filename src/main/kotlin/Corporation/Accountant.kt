@@ -2,12 +2,18 @@ package Corporation
 
 import java.io.File
 
-class Accountant(id: Int, name: String, age: Int): Worker(id,name,age, WorkerType.ACCOUNTANT) {
+class Accountant(id: Int, name: String, age: Int, salary: Int = 60000): Worker(
+    id = id,
+    name = name,
+    age = age,
+    salary = salary,
+    position = WorkerType.ACCOUNTANT
+), Cleaner, Provider {
 
     private val fileCards = File("ProductCard.txt")
     private val fileEmployee = File("Employees.txt")
     fun saveWorkerToFile(worker: Worker){
-        fileEmployee.appendText("${worker.id}%${worker.name}%${worker.age}%")
+        fileEmployee.appendText("${worker.id}%${worker.name}%${worker.age}%${worker.getSalary()}%")
         when(worker){
             is Director -> {
                 fileEmployee.appendText("${WorkerType.DIRECTOR}\n")
@@ -23,8 +29,31 @@ class Accountant(id: Int, name: String, age: Int): Worker(id,name,age, WorkerTyp
             }
         }
     }
-    override fun printInfo(){
-        println("Accountant - Id: $id, Name: $name, Age: $age")
+
+    private fun changeSalary(){
+        val employees: MutableList<Worker> = ShowAllEmployees()
+        print("Enter id worker to change salary: ")
+        val id = readln().toInt()
+        print("Enter a new salary: ")
+        val salary = readln().toInt()
+        for ((index, employ) in employees.withIndex()){
+            if (employ.id == id){
+                employ.setSalary(salary)
+                break
+            }
+        }
+        fileEmployee.writeText("")
+        for (employee in employees){
+            saveWorkerToFile(employee)
+        }
+    }
+
+    override fun clean() {
+        println("My position is Accountant. I am cleaning workspace")
+    }
+
+    override fun buyThings() {
+        println("My position Accountant. I am but things")
     }
 
     private fun saveProductCard(productCard: ProductCard){
@@ -96,15 +125,14 @@ class Accountant(id: Int, name: String, age: Int): Worker(id,name,age, WorkerTyp
                     print(":")
                 }
             }
+        val productTypeIndex = readln().toInt()
         print("Enter the product name: ")
         val name = readln()
         print("Enter the product brand: ")
         val brand = readln()
         print("Enter the product price: ")
         val price = readln().toInt()
-            val productTypeIndex = readln().toInt()
             val productType = productTypes[productTypeIndex]
-
             val card = when (productType) {
                 ProductType.FOOD -> {
                     print("Enter expiration date: ")
@@ -143,30 +171,34 @@ class Accountant(id: Int, name: String, age: Int): Worker(id,name,age, WorkerTyp
         val name = readln()
         print("Enter age: ")
         val age = readln().toInt()
+        print("Enter salary: ")
+        val salary = readln().toInt()
         val workerType = workerTypes[workerTypeIndex]
         val employee = when(workerType){
             WorkerType.DIRECTOR -> {
-                Director(id,name,age)
+                Director(id,name,age,salary)
             }
             WorkerType.ACCOUNTANT -> {
-                Accountant(id,name,age)
+                Accountant(id,name,age,salary)
             }
             WorkerType.ASSISTANT -> {
-                Assistant(id,name,age)
+                Assistant(id,name,age,salary)
             }
             WorkerType.CONSULTANT -> {
-                Consultant(id,name,age)
+                Consultant(id,name,age,salary)
             }
         }
+        employee.setSalary(salary)
         saveWorkerToFile(employee)
     }
 
-    private fun ShowAllEmployees(): MutableList<Worker>{
+    fun ShowAllEmployees(): MutableList<Worker>{
         val employees = mutableListOf<Worker>()
-        val content = fileEmployee.readText().trim()
         if (!fileEmployee.exists()){
             fileEmployee.createNewFile()
         }
+        val content = fileEmployee.readText().trim()
+
         if(content.isEmpty()){
             return employees
         }
@@ -174,13 +206,20 @@ class Accountant(id: Int, name: String, age: Int): Worker(id,name,age, WorkerTyp
         for (employeeAsString in employeesAsString){
             val employeeString = employeeAsString.split("%")
             val workerType = WorkerType.valueOf(employeeString.last())
-            when(workerType){
-                WorkerType.DIRECTOR -> {employees.add(Director(employeeString[0].toInt(),employeeString[1],employeeString[2].toInt()))}
-                WorkerType.ACCOUNTANT -> {employees.add(Accountant(employeeString[0].toInt(),employeeString[1],employeeString[2].toInt()))}
-                WorkerType.ASSISTANT -> {employees.add(Assistant(employeeString[0].toInt(),employeeString[1],employeeString[2].toInt()))}
-                WorkerType.CONSULTANT -> {employees.add(Consultant(employeeString[0].toInt(),employeeString[1],employeeString[2].toInt()))}
+            val id = employeeString[0].toInt()
+            val name = employeeString[1]
+            val age = employeeString[2].toInt()
+            val salary = employeeString[3].toInt()
+            val worker = when(workerType){
+                WorkerType.DIRECTOR -> {Director(id,name,age,salary)}
+                WorkerType.ACCOUNTANT -> {Accountant(id,name,age,salary)}
+                WorkerType.ASSISTANT -> {Assistant(id,name,age,salary)}
+                WorkerType.CONSULTANT -> {Consultant(id,name,age,salary)}
             }
+            worker.setSalary(salary)
+            employees.add(worker)
         }
+
         for (employee in employees){
             employee.printInfo()
         }
@@ -225,6 +264,7 @@ class Accountant(id: Int, name: String, age: Int): Worker(id,name,age, WorkerTyp
                 OperationCode.REGISTER_NEW_EMPLOYEE -> RegisterNewEmployee()
                 OperationCode.FIRE_AN_EMPLOYEE -> FireAnEmployee()
                 OperationCode.SHOW_ALL_EMPLOYEE -> ShowAllEmployees()
+                OperationCode.CHANGE_SALARY -> changeSalary()
             }
         }
     }
