@@ -7,6 +7,11 @@ class Assistant(id: Int,name: String,age: Int, salary: Int = 50_000):Worker(
     salary = salary,
     position = WorkerType.ASSISTANT
 ), Cleaner, Provider {
+
+    override fun copy(salary: Int,age: Int): Assistant {
+        return Assistant(this.id,this.name,age,salary)
+    }
+
     override fun work(){
         println("I assistant number $id go to the coffee for director")
     }

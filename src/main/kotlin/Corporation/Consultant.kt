@@ -9,9 +9,14 @@ class Consultant(id: Int,name: String, age: Int, salary: Int = 40_000): Worker(
     salary = salary,
     position = WorkerType.CONSULTANT
 ), Cleaner {
+
+    override fun copy(salary: Int,age: Int): Consultant {
+        return Consultant(this.id,this.name,age,salary)
+    }
+
     override fun work() {
         repeat(Random.nextInt(0, 10)) {
-            println("I consultant number $id service client")
+            print("I consultant number $id customer is server ")
         }
     }
 

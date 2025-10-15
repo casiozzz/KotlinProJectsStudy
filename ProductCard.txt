@@ -1,2 +1,1 @@
-1%1%1%1%FOOD
-1%1%1%1.0%SHOE
+Near%Brag%500%2%APPLIANCE
