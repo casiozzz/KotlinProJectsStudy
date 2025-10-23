@@ -8,11 +8,12 @@ object WorkersRepository {
     val workers
         get() = _workers.toList()
 
-    fun RegisterNewEmployee(worker: Worker){  _workers.add(worker)
+    fun RegisterNewEmployee(newWorker: Worker){
+        _workers.add(newWorker)
     }
 
-     private fun loadAllEmployees(): MutableList<Worker>{
-        val employees = mutableListOf<Worker>()
+     private fun loadAllEmployees(): MutableSet<Worker>{
+        val employees = mutableSetOf<Worker>()
         if (!fileEmployee.exists()){
             fileEmployee.createNewFile()
         }
@@ -50,10 +51,12 @@ object WorkersRepository {
     }
 
      fun changeSalary(id: Int,salary: Int){
-        for ((index,worker) in _workers.withIndex()){
+        for (worker in _workers){
             if (worker.id == id){
                 val newWorker = worker.copy(salary = salary)
-                _workers[index] = newWorker
+                _workers.remove(worker)
+                _workers.add(newWorker)
+                break
             }
         }
     }
@@ -67,12 +70,32 @@ object WorkersRepository {
     }
 
     fun changeAge(id: Int,age: Int){
-        for ((index,worker) in _workers.withIndex()){
+        for (worker in _workers){
             if (worker.id == id){
                 val newWorker = worker.copy(age = age)
-                _workers[index] = newWorker
+                _workers.remove(worker)
+                _workers.add(newWorker)
+                break
             }
         }
+    }
+
+    fun findAssistant(): Assistant? {
+        for (worker in _workers){
+            if (worker is Assistant){
+                return worker
+            }
+        }
+        return null
+    }
+
+    fun findDirector(): Director? {
+        for (worker in _workers){
+            if (worker is Director){
+                return worker
+            }
+        }
+        return null
     }
 
 }

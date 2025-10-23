@@ -8,8 +8,8 @@ object CardsRepository {
     val cards
         get() = _cards.toList()
 
-    private fun loadAllItems(): MutableList<ProductCard> {
-        val items = mutableListOf<ProductCard>()
+    private fun loadAllItems(): MutableSet<ProductCard> {
+        val items = mutableSetOf<ProductCard>()
         val content = fileCards.readText().trim()
         if (content.isEmpty()){
             return items

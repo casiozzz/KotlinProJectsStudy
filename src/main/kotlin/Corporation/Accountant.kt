@@ -1,8 +1,13 @@
 package Corporation
 
 import java.io.File
+import javax.swing.text.Position
 
-class Accountant(id: Int, name: String, age: Int, salary: Int = 60000): Worker(
+data class Accountant(
+    override val id: Int,
+    override val name: String,
+    override val age: Int,
+    override val salary: Int = 60000): Worker(
     id = id,
     name = name,
     age = age,
@@ -13,8 +18,8 @@ class Accountant(id: Int, name: String, age: Int, salary: Int = 60000): Worker(
     private val workersRepository = WorkersRepository
     private val cardsRepository = CardsRepository
 
-    override fun copy(salary: Int, age: Int): Accountant {
-        return Accountant(this.id,this.name,age,salary)
+    override fun copy(id: Int, name: String, age: Int, salary: Int, position: WorkerType): Worker {
+        return copy(id = id, name = name, age = age, salary = salary)
     }
 
     private fun changeSalary(){
